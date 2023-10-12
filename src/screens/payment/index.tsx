@@ -31,20 +31,6 @@ const Payment = () => {
     msg: "Please Wait",
   });
 
-  // useEffect(() => {
-  //   const checkCondition = () => {
-  //     if (!toggleAlert.alert) {
-  //       clearInterval(intervalId);
-  //     } else {
-  //       alert(toggleAlert.msg);
-  //     }
-  //   };
-
-  //   const intervalId = setInterval(checkCondition, 1000);
-
-  //   return () => clearInterval(intervalId);
-  // }, [toggleAlert]);
-
   useEffect(() => {
     chainCredsApi();
     authorizedUser();
@@ -129,7 +115,7 @@ const Payment = () => {
     const transactionParameters = {
       to: chainCreds.adminWalletAddress, // adminWalletAddress
       from: account, // must match user's active address.
-      value: "0xDE0B6B3A7640000", // Only required to send ether to the recipient from the initiating external account.
+      value: chainCreds.subscriptionFees, // Only required to send ether to the recipient from the initiating external account.
       gas: "0x6b540",
       gasPrice: "0xaf16b1bb3",
     };
@@ -154,7 +140,9 @@ const Payment = () => {
       });
     });
   };
-
+  const redirectToApp = () => {
+    window.location.href = 'https://galaxiinvest.com';
+  };
   return (
     <Container>
       <ContainerWrapper>
@@ -177,17 +165,25 @@ const Payment = () => {
                 </TokenPrice>
                 <SubscribeButtonStyled
                   disabled={toggleAlert.alert}
-                  onClick={handleSubscribe}
+                  onClick={redirectToApp}
                 >
                   Subscribe now
                 </SubscribeButtonStyled>
               </>
             )}
             {TXHash ? (
-              <Text2>
-                Membership successfully activated! Now, let's get back to
-                enjoying your app.
-              </Text2>
+              <>
+                <Text2>
+                  Membership successfully activated! Now, let's get back to
+                  enjoying your app.
+                </Text2>
+                <SubscribeButtonStyled
+                  disabled={toggleAlert.alert}
+                  onClick={redirectToApp}
+                >
+                 Back to App
+                </SubscribeButtonStyled>
+              </>
             ) : (
               <></>
             )}
