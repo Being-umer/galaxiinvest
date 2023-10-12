@@ -115,7 +115,7 @@ const Payment = () => {
     try {
       if (signer) {
         await signer.provider?.send("wallet_switchEthereumChain", [
-          { chainId: chainCreds.chainId },
+          { chainId: 9731 },
         ]);
       }
     } catch (switchError) {
