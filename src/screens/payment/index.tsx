@@ -165,7 +165,7 @@ const Payment = () => {
                 </TokenPrice>
                 <SubscribeButtonStyled
                   disabled={toggleAlert.alert}
-                  onClick={redirectToApp}
+                  onClick={handleSubscribe}
                 >
                   Subscribe now
                 </SubscribeButtonStyled>
