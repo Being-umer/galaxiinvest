@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { Metamask } from "../../assets";
@@ -10,23 +9,22 @@ import {
   membershipVerification,
 } from "./util";
 import { primary_color } from "../../assets/colors";
-// import { ethers } from "ethers";
-import Web3 from "web3";
+import { ethers } from "ethers";
 
 // const Injected = new InjectedConnector({
 //   supportedChainIds: [9731],
 // });
-let web3: Web3;
+
 const Payment = () => {
   let provider;
   const authCode = window.location.href
     .split("payment/")[1]
     .replace(/\//g, ".");
-    web3 = new Web3((window as any).ethereum);
+
   const [loading, setLoading] = useState(true);
-  const [signer, setSigner] = useState();
-  const [account, setAccount] = useState();
-  const [TXHash, setTXHash] = useState();
+  const [signer, setSigner] = useState<ethers.JsonRpcSigner>();
+  const [account, setAccount] = useState<string>();
+  const [TXHash, setTXHash] = useState<string>();
   const [chainCreds, setChainCreds] = useState(chainCredentials);
   const [toggleAlert, setToggleAlert] = useState({
     alert: false,
@@ -50,72 +48,20 @@ const Payment = () => {
   useEffect(() => {
     chainCredsApi();
     authorizedUser();
-    // connect();
+    connect();
   }, []);
 
-  // function handleEthereum() {
-  //   const { ethereum } = window;
-  //   if (ethereum && ethereum.isMetaMask) {
-  //     alert("Ethereum successfully detected!");
-  //     // Access the decentralized web!
-  //   } else {
-  //     alert("Please install MetaMask!");
-  //   }
-  // }
-  console.log(window.ethereum);
-  
-
   const connect = async () => {
-		// Check if MetaMask is installed
-    web3.eth.requestAccounts()
-		if (!(window as any).ethereum) {
-			window.alert('Please install MetaMask first.');
-			return;
-		}
-
-		if (!web3) {
-			try {
-				// Request account access if needed
-				// await (window as any).ethereum.enable();
-
-				// We don't know window.web3 version, so we use our own instance of Web3
-				// with the injected provider given by MetaMask
-				
-			} catch (error) {
-				window.alert('You need to allow MetaMask.');
-				return;
-			}
-		}
-
-		const coinbase = await web3.eth.getCoinbase();
-		if (!coinbase) {
-			window.alert('Please activate MetaMask first.');
-			return;
-		}
-
-		
-	};
-
-
-  // const connect = async () => {
-  //   if (window.ethereum == null) {
-  //     setToggleAlert({
-  //       alert: true,
-  //       msg: "MetaMask not installed; using read-only defaults",
-  //     });
-  //     window.addEventListener("ethereum#initialized", handleEthereum, {
-  //       once: true,
-  //     });
-  //     console.log("MetaMask not installed; using read-only defaults");
-  //     provider = ethers.getDefaultProvider(chainCreds.rpcUrls[0]);
-  //   } else {
-  //     handleEthereum();
-  //     provider = new ethers.BrowserProvider(window.ethereum);
-  //     const sign = await provider.getSigner();
-  //     setSigner(sign);
-  //     setAccount(sign.address);
-  //   }
-  // };
+    if (window.ethereum == null) {
+      console.log("MetaMask not installed; using read-only defaults");
+      provider = ethers.getDefaultProvider(chainCreds.rpcUrls[0]);
+    } else {
+      provider = new ethers.BrowserProvider(window.ethereum);
+      const sign: ethers.JsonRpcSigner = await provider.getSigner();
+      setSigner(sign);
+      setAccount(sign.address);
+    }
+  };
 
   const verifyMembership = async (res: unknown) => {
     await membershipVerification({ txHash: res, from: account }, authCode);
@@ -148,64 +94,65 @@ const Payment = () => {
     }
   };
 
-  // const changeQIchain = async () => {
-  //   try {
-  //     await window.ethereum.request({
-  //       method: "wallet_switchEthereumChain",
-  //       params: [{ chainId: chainCreds.chainId }],
-  //     });
-  //   } catch (switchError) {
-  //     console.log(switchError);
+  const changeQIchain = async () => {
+    try {
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: chainCreds.chainId }],
+      });
+    } catch (switchError) {
+      console.log(switchError);
 
-  //     // This error code indicates that the chain has not been added to MetaMask.
-  //     if ((switchError as { code: number })?.code === 4902) {
-  //       try {
-  //         await window.ethereum.request({
-  //           method: "wallet_addEthereumChain",
-  //           params: [
-  //             {
-  //               chainId: chainCreds.chainId,
-  //               chainName: chainCreds.chainName,
-  //               blockExplorerUrls: chainCreds.blockExplorerUrls,
-  //               nativeCurrency: { ...chainCreds.nativeCurrency },
-  //               rpcUrls: [...chainCreds.rpcUrls],
-  //             },
-  //           ],
-  //         });
-  //       } catch (addError) {
-  //         console.log(addError);
-  //       }
-  //     }
-  //   }
-  // };
+      // This error code indicates that the chain has not been added to MetaMask.
+      if ((switchError as { code: number })?.code === 4902) {
+        try {
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [
+              {
+                chainId: chainCreds.chainId,
+                chainName: chainCreds.chainName,
+                blockExplorerUrls: chainCreds.blockExplorerUrls,
+                nativeCurrency: { ...chainCreds.nativeCurrency },
+                rpcUrls: [...chainCreds.rpcUrls],
+              },
+            ],
+          });
+        } catch (addError) {
+          console.log(addError);
+        }
+      }
+    }
+  };
 
-  // const sendTransaction = async () => {
-  //   const transactionParameters = {
-  //     to: chainCreds.adminWalletAddress, // adminWalletAddress
-  //     from: account, // must match user's active address.
-  //     value: "0xDE0B6B3A7640000", // Only required to send ether to the recipient from the initiating external account.
-  //     gas: "0x6b540",
-  //     gasPrice: "0xaf16b1bb3",
-  //   };
-  //   try {
-  //     const txHash: unknown = await signer.provider?.send(
-  //       "eth_sendTransaction",
-  //       [transactionParameters]
-  //     );
-  //     verifyMembership(txHash);
-  //     setTXHash(txHash);
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  // };
+  const sendTransaction = async () => {
+    const transactionParameters = {
+      to: chainCreds.adminWalletAddress, // adminWalletAddress
+      from: account, // must match user's active address.
+      value: "0xDE0B6B3A7640000", // Only required to send ether to the recipient from the initiating external account.
+      gas: "0x6b540",
+      gasPrice: "0xaf16b1bb3",
+    };
+    try {
+      if (signer) {
+        const txHash: string = await signer.provider?.send(
+          "eth_sendTransaction",
+          [transactionParameters]
+        );
+        verifyMembership(txHash);
+        setTXHash(txHash);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   const handleSubscribe = async () => {
-    await connect()
-    // connect().then(() => {
-      // changeQIchain().then(() => {
-      //   sendTransaction();
-      // });
-    // });
+    connect().then(() => {
+      changeQIchain().then(() => {
+        sendTransaction();
+      });
+    });
   };
 
   return (
@@ -229,8 +176,8 @@ const Payment = () => {
                   <Token>/ Year</Token>
                 </TokenPrice>
                 <SubscribeButtonStyled
-                  disabled={toggleAlert.alert || TXHash}
-                  onClick={connect}
+                  disabled={toggleAlert.alert}
+                  onClick={handleSubscribe}
                 >
                   Subscribe now
                 </SubscribeButtonStyled>
