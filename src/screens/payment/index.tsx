@@ -16,13 +16,14 @@ import { ethers } from "ethers";
 // });
 
 const Payment = () => {
-  let provider;
+  let provider: ethers.BrowserProvider;
   const authCode = window.location.href
     .split("payment/")[1]
     .replace(/\//g, ".");
 
   const [loading, setLoading] = useState(true);
   const [signer, setSigner] = useState<ethers.JsonRpcSigner>();
+  const [Provider, setProvider] = useState<ethers.BrowserProvider>();
   const [account, setAccount] = useState<string>();
   const [TXHash, setTXHash] = useState<string>();
   const [chainCreds, setChainCreds] = useState(chainCredentials);
@@ -38,14 +39,19 @@ const Payment = () => {
   }, []);
 
   const connect = async () => {
-    if (window.ethereum == null) {
-      console.log("MetaMask not installed; using read-only defaults");
-      provider = ethers.getDefaultProvider(chainCreds.rpcUrls[0]);
-    } else {
-      provider = new ethers.BrowserProvider(window.ethereum);
-      const sign: ethers.JsonRpcSigner = await provider.getSigner();
-      setSigner(sign);
-      setAccount(sign.address);
+    try {
+      if (window.ethereum == null) {
+        console.log("MetaMask not installed; using read-only defaults");
+        // provider = ethers.getDefaultProvider(chainCreds.rpcUrls[0]);
+      } else {
+        provider = new ethers.BrowserProvider(window.ethereum);
+        setProvider(provider);
+        const sign: ethers.JsonRpcSigner = await provider.getSigner();
+        setSigner(sign);
+        setAccount(sign.address);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -82,63 +88,20 @@ const Payment = () => {
 
   const changeQIchain = async () => {
     try {
-      await window.ethereum.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: chainCreds.chainId }],
-      });
-    } catch (switchError) {
-      console.log(switchError);
-
-      // This error code indicates that the chain has not been added to MetaMask.
-      if ((switchError as { code: number })?.code === 4902) {
-        try {
-          await window.ethereum.request({
-            method: "wallet_addEthereumChain",
-            params: [
-              {
-                chainId: chainCreds.chainId,
-                chainName: chainCreds.chainName,
-                blockExplorerUrls: chainCreds.blockExplorerUrls,
-                nativeCurrency: { ...chainCreds.nativeCurrency },
-                rpcUrls: [...chainCreds.rpcUrls],
-              },
-            ],
-          });
-        } catch (addError) {
-          console.log(addError);
-        }
-      }
-    }
-  };
-
-  const changeQIchainEthers = async () => {
-    try {
-      if (signer) {
-        await signer.provider?.send("wallet_switchEthereumChain", [
-          { chainId: 9731 },
+      if (Provider) {
+        await Provider?.send("wallet_addEthereumChain", [
+          {
+            chainId: chainCreds.chainId,
+            chainName: chainCreds.chainName,
+            blockExplorerUrls: chainCreds.blockExplorerUrls,
+            nativeCurrency: { ...chainCreds.nativeCurrency },
+            rpcUrls: [...chainCreds.rpcUrls],
+          },
         ]);
+        sendTransaction();
       }
-    } catch (switchError) {
-      console.log(switchError);
-
-      // This error code indicates that the chain has not been added to MetaMask.
-      if ((switchError as { code: number })?.code === 4902) {
-        try {
-          if (signer) {
-            await signer.provider?.send("wallet_addEthereumChain", [
-              {
-                chainId: 9731,
-                chainName: chainCreds.chainName,
-                blockExplorerUrls: chainCreds.blockExplorerUrls,
-                nativeCurrency: { ...chainCreds.nativeCurrency },
-                rpcUrls: [...chainCreds.rpcUrls],
-              },
-            ]);
-          }
-        } catch (addError) {
-          console.log(addError);
-        }
-      }
+    } catch (addError) {
+      console.log(addError);
     }
   };
 
@@ -167,8 +130,11 @@ const Payment = () => {
   const handleSubscribe = async () => {
     connect().then(() => {
       changeQIchain().then(() => {
-        sendTransaction();
-      });
+       
+      }).catch((l)=>{
+        console.log(l);
+        
+      })
     });
   };
   const redirectToApp = () => {
@@ -199,18 +165,6 @@ const Payment = () => {
                   onClick={handleSubscribe}
                 >
                   Subscribe now
-                </SubscribeButtonStyled>
-                <SubscribeButtonStyled
-                  disabled={toggleAlert.alert}
-                  onClick={changeQIchain}
-                >
-                  change chain Ethereum
-                </SubscribeButtonStyled>
-                <SubscribeButtonStyled
-                  disabled={toggleAlert.alert}
-                  onClick={changeQIchainEthers}
-                >
-                  change chain with Ethers
                 </SubscribeButtonStyled>
               </>
             )}
