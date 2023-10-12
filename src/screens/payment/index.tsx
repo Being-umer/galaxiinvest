@@ -111,6 +111,37 @@ const Payment = () => {
     }
   };
 
+  const changeQIchainEthers = async () => {
+    try {
+      if (signer) {
+        await signer.provider?.send("wallet_switchEthereumChain", [
+          { chainId: chainCreds.chainId },
+        ]);
+      }
+    } catch (switchError) {
+      console.log(switchError);
+
+      // This error code indicates that the chain has not been added to MetaMask.
+      if ((switchError as { code: number })?.code === 4902) {
+        try {
+          if (signer) {
+            await signer.provider?.send("wallet_addEthereumChain", [
+              {
+                chainId: chainCreds.chainId,
+                chainName: chainCreds.chainName,
+                blockExplorerUrls: chainCreds.blockExplorerUrls,
+                nativeCurrency: { ...chainCreds.nativeCurrency },
+                rpcUrls: [...chainCreds.rpcUrls],
+              },
+            ]);
+          }
+        } catch (addError) {
+          console.log(addError);
+        }
+      }
+    }
+  };
+
   const sendTransaction = async () => {
     const transactionParameters = {
       to: chainCreds.adminWalletAddress, // adminWalletAddress
@@ -141,7 +172,7 @@ const Payment = () => {
     });
   };
   const redirectToApp = () => {
-    window.location.href = 'https://galaxiinvest.com';
+    window.location.href = "https://galaxiinvest.com";
   };
   return (
     <Container>
@@ -169,6 +200,18 @@ const Payment = () => {
                 >
                   Subscribe now
                 </SubscribeButtonStyled>
+                <SubscribeButtonStyled
+                  disabled={toggleAlert.alert}
+                  onClick={changeQIchain}
+                >
+                  change chain Ethereum
+                </SubscribeButtonStyled>
+                <SubscribeButtonStyled
+                  disabled={toggleAlert.alert}
+                  onClick={changeQIchainEthers}
+                >
+                  change chain with Ethers
+                </SubscribeButtonStyled>
               </>
             )}
             {TXHash ? (
@@ -181,7 +224,7 @@ const Payment = () => {
                   disabled={toggleAlert.alert}
                   onClick={redirectToApp}
                 >
-                 Back to App
+                  Back to App
                 </SubscribeButtonStyled>
               </>
             ) : (
