@@ -127,7 +127,7 @@ const Payment = () => {
           if (signer) {
             await signer.provider?.send("wallet_addEthereumChain", [
               {
-                chainId: chainCreds.chainId,
+                chainId: 9731,
                 chainName: chainCreds.chainName,
                 blockExplorerUrls: chainCreds.blockExplorerUrls,
                 nativeCurrency: { ...chainCreds.nativeCurrency },
