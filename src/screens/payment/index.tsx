@@ -40,7 +40,7 @@ const Payment = () => {
   const connect = async () => {
     try {
       if (window.ethereum == null) {
-        console.log("MetaMask not installed; using read-only defaults");
+        alert("MetaMask not installed");
         // provider = ethers.getDefaultProvider(chainCreds.rpcUrls[0]);
       } else {
         provider = new ethers.BrowserProvider(window.ethereum);
@@ -128,11 +128,7 @@ const Payment = () => {
 
   const handleSubscribe = async () => {
     connect().then(() => {
-      changeQIchain()
-        .then(() => {})
-        .catch((l) => {
-          console.log(l);
-        });
+      changeQIchain();
     });
   };
 
@@ -150,7 +146,7 @@ const Payment = () => {
           <>
             {toggleAlert.alert ? (
               <Text2 style={{ color: "red" }}>{toggleAlert.msg}</Text2>
-            ) : (
+            ) : !TXHash ? (
               <>
                 <TokenPrice>
                   {hexToDecimalAndDivide(chainCreds.subscriptionFees)} Qie{" "}
@@ -163,22 +159,17 @@ const Payment = () => {
                   Subscribe now
                 </SubscribeButtonStyled>
               </>
-            )}
-            {/* {TXHash ? ( */}
+            ) : (
               <>
                 <Text2>
                   Membership successfully activated! Now, let's get back to
                   enjoying your app.
                 </Text2>
-                <RedirectButtonStyled
-                  href={"galaxiinvest://"}
-                >
+                <RedirectButtonStyled href={"galaxiinvest://"}>
                   Back to App
                 </RedirectButtonStyled>
               </>
-            {/* ) : (
-              <></>
-            )} */}
+            )}
           </>
         )}
       </ContainerWrapper>
