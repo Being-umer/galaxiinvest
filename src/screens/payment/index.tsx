@@ -10,7 +10,6 @@ import {
 } from "./util";
 import { primary_color } from "../../assets/colors";
 import { ethers } from "ethers";
-
 // const Injected = new InjectedConnector({
 //   supportedChainIds: [9731],
 // });
@@ -129,17 +128,14 @@ const Payment = () => {
 
   const handleSubscribe = async () => {
     connect().then(() => {
-      changeQIchain().then(() => {
-       
-      }).catch((l)=>{
-        console.log(l);
-        
-      })
+      changeQIchain()
+        .then(() => {})
+        .catch((l) => {
+          console.log(l);
+        });
     });
   };
-  const redirectToApp = () => {
-    window.location.href = "https://galaxiinvest.com";
-  };
+
   return (
     <Container>
       <ContainerWrapper>
@@ -168,22 +164,21 @@ const Payment = () => {
                 </SubscribeButtonStyled>
               </>
             )}
-            {TXHash ? (
+            {/* {TXHash ? ( */}
               <>
                 <Text2>
                   Membership successfully activated! Now, let's get back to
                   enjoying your app.
                 </Text2>
-                <SubscribeButtonStyled
-                  disabled={toggleAlert.alert}
-                  onClick={redirectToApp}
+                <RedirectButtonStyled
+                  href={"galaxiinvest://"}
                 >
                   Back to App
-                </SubscribeButtonStyled>
+                </RedirectButtonStyled>
               </>
-            ) : (
+            {/* ) : (
               <></>
-            )}
+            )} */}
           </>
         )}
       </ContainerWrapper>
@@ -211,6 +206,20 @@ const ContainerWrapper = styled.div`
 const Image = styled.img``;
 
 const SubscribeButtonStyled = styled.button`
+  color: white;
+  margin: 7px;
+  margin-top: 30px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+  background-color: #3853a4;
+  border: 2px solid #3853a4;
+  border-radius: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+`;
+
+const RedirectButtonStyled = styled.a`
   color: white;
   margin: 7px;
   margin-top: 30px;
