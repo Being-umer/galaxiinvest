@@ -165,7 +165,7 @@ const Payment = () => {
                   Membership successfully activated! Now, let's get back to
                   enjoying your app.
                 </Text2>
-                <RedirectButtonStyled href={"https://galaxiinvest.app"}>
+                <RedirectButtonStyled href={"galaxiinvest://"}>
                   Back to App
                 </RedirectButtonStyled>
               </>
