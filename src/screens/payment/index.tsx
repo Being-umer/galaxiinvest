@@ -118,8 +118,12 @@ const Payment = () => {
           "eth_sendTransaction",
           [transactionParameters]
         );
+        setLoading(true);
         verifyMembership(txHash);
-        setTXHash(txHash);
+        setTimeout(() => {
+          setLoading(false);
+          setTXHash(txHash);
+        }, 10000);
       }
     } catch (e) {
       console.log(e);
@@ -139,9 +143,12 @@ const Payment = () => {
         <METAMASK>M E T A M A S K</METAMASK>
         <Text2>Get hottest stock picks in the world using AI</Text2>
         {loading ? (
-          <LoaderContainer>
-            <Loader></Loader>
-          </LoaderContainer>
+          <>
+            <LoaderContainer>
+              <Loader></Loader>
+            </LoaderContainer>
+            <Text2>Please wait...</Text2>
+          </>
         ) : (
           <>
             {toggleAlert.alert ? (
