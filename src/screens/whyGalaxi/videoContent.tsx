@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import styled from "styled-components";
 import { VideoPlay } from "../../assets";
+import demoVideo from "../../assets/video/video.mp4";
 
 interface PlayPauseButtonProps {
   play: boolean;
@@ -23,11 +24,11 @@ const VideoContent = () => {
   };
   return (
     <>
-      <Video ref={videoRef} controls={false} onClick={togglePlayPause} >
-        <Source src="/video/video.mp4" type="video/mp4" />
+      <Video ref={videoRef} controls={false} onClick={togglePlayPause}>
+        <Source src={demoVideo} type="video/mp4" />
       </Video>
       <PlayPauseButton play={isPlaying} onClick={togglePlayPause}>
-       <PlayLogo src={VideoPlay} />
+        <PlayLogo src={VideoPlay} />
       </PlayPauseButton>
     </>
   );
@@ -50,8 +51,7 @@ const Source = styled.source`
 `;
 
 const PlayPauseButton = styled.button<PlayPauseButtonProps>`
-  display: ${(props) =>
-    props.play ? "none" : "block"}; 
+  display: ${(props) => (props.play ? "none" : "block")};
   position: absolute;
   top: 50%;
   left: 50%;
@@ -63,4 +63,4 @@ const PlayPauseButton = styled.button<PlayPauseButtonProps>`
   cursor: pointer;
 `;
 
-const PlayLogo = styled.img``
+const PlayLogo = styled.img``;

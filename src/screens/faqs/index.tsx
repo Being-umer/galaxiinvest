@@ -26,7 +26,7 @@ const FAQS = forwardRef<HTMLDivElement | null>((_, ref) => {
   const [tabsData, setTabsData] = useState<IFaqs | undefined>();
 
   const fetchtabData = async () => {
-    const res = await fetch("https://api.galaxi.meissasoft.com/faqs");
+    const res = await fetch("https://api.galaxiinvest.com/faqs");
     const data = await res.json();
     setTabsData(data.faqs);
   };

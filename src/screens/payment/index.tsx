@@ -15,7 +15,7 @@ import { ethers } from "ethers";
 // });
 
 const Payment = () => {
-  let provider: ethers.BrowserProvider;
+  let provider: ethers.BrowserProvider | any;
   const authCode = window.location.href
     .split("payment/")[1]
     .replace(/\//g, ".");
@@ -31,26 +31,42 @@ const Payment = () => {
     msg: "Please Wait",
   });
 
-  useEffect(() => {
-    chainCredsApi();
+  console.log(chainCredentials);
+
+  console.log(chainCreds);
+  useEffect(()=>{
+    chainCredsApi(); 
     authorizedUser();
-    connect();
-  }, []);
+  },[])
+  
+
+  useEffect(() => {
+    if(chainCreds.chainId !== ""){
+      connect();
+    }
+  }, [chainCreds]);
 
   const connect = async () => {
+    console.log(window.ethereum);
+    
     try {
-      if (window.ethereum == null) {
+      if (typeof window.ethereum === 'undefined') {
         alert("MetaMask not installed");
-        // provider = ethers.getDefaultProvider(chainCreds.rpcUrls[0]);
+        console.log('notconnect');
+        
+        provider = ethers.getDefaultProvider(chainCreds.rpcUrls[0]);
       } else {
         provider = new ethers.BrowserProvider(window.ethereum);
         setProvider(provider);
+        console.log('connect');
+
         const sign: ethers.JsonRpcSigner = await provider.getSigner();
         setSigner(sign);
         setAccount(sign.address);
       }
     } catch (error) {
       console.log(error);
+
     }
   };
 
@@ -75,6 +91,8 @@ const Payment = () => {
   const chainCredsApi = async () => {
     try {
       const user = await getChainCreds(authCode);
+      console.log(user);
+      
       if (user.data) {
         setChainCreds(user.data);
         setLoading(false);
@@ -101,6 +119,7 @@ const Payment = () => {
       }
     } catch (addError) {
       console.log(addError);
+
     }
   };
 
@@ -133,7 +152,8 @@ const Payment = () => {
   const handleSubscribe = async () => {
     connect().then(() => {
       changeQIchain();
-    });
+    }).catch((error)=>{
+    })
   };
 
   return (

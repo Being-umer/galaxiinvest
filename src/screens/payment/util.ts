@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 
-export const API_BASE_URL = "https://api.galaxi.meissasoft.com";
+export const API_BASE_URL = "https://api.galaxiinvest.com";
 
 export function hexToDecimalAndDivide(hexString: string) {
   // Using parseInt with base 16 (hexadecimal) to convert to decimal

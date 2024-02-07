@@ -1,8 +1,9 @@
 import React from "react";
 import { styled } from "styled-components";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Screens from './screens';
-import Payment from './screens/payment';
+import Screens from "./screens";
+import Payment from "./screens/payment";
+import LogIn from "./screens/login";
 
 const router = createBrowserRouter([
   {
@@ -12,6 +13,14 @@ const router = createBrowserRouter([
   {
     path: "/payment/*",
     element: <Payment />,
+  },
+  {
+    path: "/payment/*",
+    element: <Payment />,
+  },
+  {
+    path: "/delete-me",
+    element: <LogIn />,
   },
 ]);
 function App() {
@@ -28,4 +37,3 @@ const Body = styled.div`
   width: 100%;
   height: 100vh;
 `;
-

@@ -1,9 +1,10 @@
-import React from "react";
-import styled from "styled-components";
+import React, { Suspense, lazy } from "react";
+import styled, { keyframes } from "styled-components";
 import { primary_color } from "../../assets/colors";
 import { GalaxiMobiles } from "../../assets";
 import Features from "./features";
-import VideoContent from "./videoContent";
+
+const LazyVideoContent = lazy(() => import("./videoContent"));
 
 interface ContainerWrapperProps {
   direction?: string;
@@ -47,10 +48,17 @@ const WhyGalaxi: React.FC<{
       <ContainerWrapper ref={ref3} direction={"column"}>
         <Title>Explainer Video</Title>
         <VideoWrapper>
-          <Ellips />
-
-          <VideoContent />
-          <Ellips2 />
+          <Ellipse />
+          <Suspense
+            fallback={
+              <LoaderContainer>
+                <Loader></Loader>
+              </LoaderContainer>
+            }
+          >
+            <LazyVideoContent />
+          </Suspense>
+          <Ellipse2/>
         </VideoWrapper>
       </ContainerWrapper>
       <ContainerWrapper direction={"column"} position={"relative"}>
@@ -146,7 +154,7 @@ const VideoWrapper = styled.div`
   margin: 15px auto;
 `;
 
-const Ellips = styled.div`
+const Ellipse = styled.div`
   position: absolute;
   width: 200px;
   height: 180px;
@@ -158,7 +166,7 @@ const Ellips = styled.div`
   filter: blur(75px);
 `;
 
-const Ellips2 = styled.div`
+const Ellipse2 = styled.div`
   position: absolute;
   width: 200px;
   height: 180px;
@@ -179,4 +187,29 @@ const Ellipse3 = styled.div`
   background: #8cc640;
   opacity: 0.6;
   filter: blur(100px);
+`;
+
+const LoadingAnim = keyframes`
+  to {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+`;
+const Loader = styled.div`
+  width: 60px;
+  height: 60px;
+  border: 8px solid #e8e8e8;
+  border-top-color: #3853a4;
+  border-radius: 50%;
+  animation: ${LoadingAnim} 1s ease infinite;
+`;
+
+const LoaderContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
